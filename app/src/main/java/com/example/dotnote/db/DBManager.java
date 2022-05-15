@@ -66,5 +66,7 @@ public class DBManager extends SQLiteOpenHelper {
             values.clear();
         }
 
+        DB.close();
+
     }
 }

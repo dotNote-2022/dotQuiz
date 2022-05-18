@@ -11,7 +11,8 @@
         android:theme="@style/Theme.DotNote">
         <activity
             android:name=".ui.gamescreen.GameActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.DotNote"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

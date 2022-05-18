@@ -55,8 +55,9 @@ public class Question {
         this.answers.put("C", questionTokens[3]);
         this.answers.put("D", questionTokens[4]);
         this.correctAnswer = questionTokens[5];
-        this.hasPicture = Boolean.getBoolean(questionTokens[6]);
-        this.picture = questionTokens[7];
+        this.questionType = QuestionType.valueOf(questionTokens[6]);
+        this.hasPicture = Boolean.parseBoolean(questionTokens[7]);
+        this.picture = questionTokens[8];
     }
 
     /**

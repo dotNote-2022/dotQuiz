@@ -32,6 +32,7 @@ public class HomeFragment extends Fragment {
 
         System.out.println("fragment");
 
+
         return root;
     }
 

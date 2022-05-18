@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        db = new DBManager(MainActivity.this, null, null, 1);
+        db = DBManager.getInstance(this);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
 
         });
+
+        System.out.println(db.checkIfUserExists());
 
     }
 

@@ -24,7 +24,7 @@ import java.util.HashMap;
 public class Referee {
 
     /* the question managing object of the game */
-    private QuestionManager questionManager = new QuestionManager();
+    private QuestionManager questionManager = new QuestionManager(null);
 
     /* the question that is currently asked to the players */
     private Question currentQuestion;

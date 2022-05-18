@@ -1,6 +1,8 @@
 package com.example.dotnote.business_logic;
 
 
+import com.example.dotnote.db.DBManager;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -9,12 +11,14 @@ import java.util.*;
  */
 public class QuestionManager {
     private ArrayList<Question> listOfQuestions;
+    private DBManager dbManager;
 
     /**
      * Default constructor which sets up the listOfQuestions
      */
-    public QuestionManager() {
+    public QuestionManager(DBManager dbManager) {
         listOfQuestions = new ArrayList<>();
+        this.dbManager = dbManager;
     }
 
     /**
@@ -55,48 +59,17 @@ public class QuestionManager {
         return returnQuestion;
     }
 
-    /**
-     * Creates question objects with data from the com.Managers.FileManager, after it has tokenized and parsed them and pushes the questions to the list of questions<br><br>
-     * <b>NOTE:</b> This method will only work if the 'questions.txt' file uses the proprietary format the developers intended, altering the delimiter symbol
-     * or the way the answer is formatted will result in the code needing to be overhauled.
-     */
-//    public void createQuestions() {
-//
-//        ArrayList<String> questionsFromFile;
-//        questionsFromFile = files.getQuestionsFromFile();
-//        for(String i: questionsFromFile) {
-//
-//            StringTokenizer tokenizedQuestion = new StringTokenizer(i,"/"); // split question line from file using the '/' delimiter
-//            ArrayList<String> tokenizedQuestionList = new ArrayList<>();
-//            while(tokenizedQuestion.hasMoreTokens())
-//                tokenizedQuestionList.add(tokenizedQuestion.nextToken());
-//
-//            String questionText = tokenizedQuestionList.get(0); // extract question text
-//            String questionAnswer = tokenizedQuestionList.get(tokenizedQuestionList.size()-4); // extract question answer
-//            QuestionType questionType = QuestionType.valueOf(tokenizedQuestionList.get(tokenizedQuestionList.size()-3)); // extract question type
-//            boolean hasPicture = !tokenizedQuestionList.get(tokenizedQuestionList.size() - 2).equals("false"); // extract whether or not it has an extra file associated with it
-//            String fileLocation = tokenizedQuestionList.get(tokenizedQuestionList.size()-1); // extract file location
-//
-//            tokenizedQuestionList.remove(0); // remove question text
-//
-//            for(int a = 0; a < 4; a++)
-//                tokenizedQuestionList.remove(tokenizedQuestionList.size()-1); // trim everything but the possible answers
-//
-//            if (!hasPicture)
-//                addNewQuestion(new Question(questionText, questionAnswer, getQuestionAnswers(tokenizedQuestionList), questionType, false));
-//            else
-//                addNewQuestion(new Question(questionText, questionAnswer, getQuestionAnswers(tokenizedQuestionList), questionType, true, fileLocation));
-//
-//        }
-//
-//        shuffleQuestions();
-//
-//    }
+    public void createQuestions(ArrayList<String> labels) {
 
-//    public HashSet<com.Question> getListOfQuestions() {
-//        HashSet<com.Question> finalListOfQuestions = listOfQuestions;
-//        return finalListOfQuestions;
-//    }
+       this.listOfQuestions = dbManager.fetchQuestions(labels);
+
+        System.out.println(listOfQuestions);
+
+    }
+
+    public void resetQuestions() {
+        this.listOfQuestions.clear();
+    }
 
     /**
      * Method that returns a hashMap containing the answers provided in the arguments, after they have been shuffled

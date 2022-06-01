@@ -62,8 +62,7 @@ public class QuestionManager {
     public void createQuestions(ArrayList<String> labels) {
 
        this.listOfQuestions = dbManager.fetchQuestions(labels);
-
-        System.out.println(listOfQuestions);
+       this.shuffleQuestions();
 
     }
 

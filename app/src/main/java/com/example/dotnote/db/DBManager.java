@@ -25,7 +25,7 @@ public class DBManager extends SQLiteOpenHelper {
 
     private static DBManager sInstance;
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "quizDB.db";
 
     // Questions table
@@ -41,6 +41,7 @@ public class DBManager extends SQLiteOpenHelper {
     public static final String PLAYERS_TABLE = "Players";
     public static final String COLUMN_ID_PLAYERS = "_id";
     public static final String COLUMN_USERNAME = "username";
+    public static final String COLUMN_PLAYER_POINTS = "points";
 
     public static synchronized DBManager getInstance(Context context) {
 
@@ -89,7 +90,8 @@ public class DBManager extends SQLiteOpenHelper {
     private void createUsersTable(SQLiteDatabase sqLiteDatabase) {
         final String CREATE_PLAYERS_TABLE_QUERY = "CREATE TABLE " + PLAYERS_TABLE + "("
                 + COLUMN_ID_PLAYERS + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_USERNAME + " TEXT NOT NULL"
+                + COLUMN_USERNAME + " TEXT NOT NULL,"
+                + COLUMN_PLAYER_POINTS + " INTEGER NOT NULL"
                 + ")";
 
         sqLiteDatabase.execSQL(CREATE_PLAYERS_TABLE_QUERY);
@@ -168,7 +170,7 @@ public class DBManager extends SQLiteOpenHelper {
      * @param labels an ArrayList with the types of the questions to be fetched
      * @return an ArrayList of Questions
      */
-    public ArrayList<Question> fetchQuestions(ArrayList<String> labels) {
+    public ArrayList<Question> fetchQuestions(ArrayList<String> labels, int diff) {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -179,6 +181,7 @@ public class DBManager extends SQLiteOpenHelper {
         }
         SELECT_QUESTIONS.append(")");
         SELECT_QUESTIONS.replace(SELECT_QUESTIONS.length() - 2, SELECT_QUESTIONS.length() - 1, "");
+        SELECT_QUESTIONS.append(" LIMIT ").append(10);
 
         System.out.println(SELECT_QUESTIONS);
 
@@ -195,8 +198,9 @@ public class DBManager extends SQLiteOpenHelper {
                 QuestionType questionType = QuestionType.valueOf(cursorQuestions.getString(4));
                 HashMap<String, String> answers = new HashMap<>();
                 String[] possibleAnswers = cursorQuestions.getString(2).split(",");
+                char c = 'A';
                 for (int i = 0; i < possibleAnswers.length; i++)
-                    answers.put(String.valueOf(i), possibleAnswers[i]);
+                    answers.put(String.valueOf(c++), possibleAnswers[i]);
                 if (!picture.equals("none")) {
                     questions.add(new Question(questionText, correctAnswer, answers, questionType, true, picture));
                 } else {
@@ -211,5 +215,48 @@ public class DBManager extends SQLiteOpenHelper {
 
         return questions;
 
+    }
+
+    public void updatePlayerStats(int score) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor player = db.rawQuery("SELECT * FROM " + PLAYERS_TABLE + " LIMIT 1", null);
+
+        player.moveToFirst();
+
+        int playerId = player.getInt(0);
+        int currentPoints = player.getInt(2);
+
+        String UPDATE_STATS = "UPDATE " + PLAYERS_TABLE +
+                " SET points=" + (currentPoints + score / 10)
+                + " WHERE _id=" + playerId + ";";
+
+        db.execSQL(UPDATE_STATS);
+
+    }
+
+    public void purchaseBoost(int cost) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor player = db.rawQuery("SELECT * FROM " + PLAYERS_TABLE + " LIMIT 1", null);
+
+        player.moveToFirst();
+
+        int playerId = player.getInt(0);
+        int currentPoints = player.getInt(2);
+
+        String UPDATE_POINTS = "UPDATE " + PLAYERS_TABLE +
+                " SET points=" + (currentPoints - cost)
+                + " WHERE _id=" + playerId + ";";
+
+        db.execSQL(UPDATE_POINTS);
+    }
+
+    public int getPlayerPoints() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor pointsCursor = db.rawQuery("SELECT " + COLUMN_PLAYER_POINTS + " FROM " + PLAYERS_TABLE + " LIMIT 1", null);
+        pointsCursor.moveToFirst();
+
+        return pointsCursor.getInt(0);
     }
 }

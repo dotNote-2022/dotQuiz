@@ -1,15 +1,27 @@
 package com.example.dotnote;
 
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.example.dotnote.business_logic.Constants;
+import com.example.dotnote.business_logic.QuestionType;
 import com.example.dotnote.db.DBManager;
+import com.example.dotnote.ui.gamescreen.GameActivity;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.constraintlayout.widget.Group;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -18,6 +30,11 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dotnote.databinding.ActivityMainBinding;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        db = new DBManager(MainActivity.this, null, null, 1);
+        db = DBManager.getInstance(this);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -54,7 +71,30 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        Button btnStart = findViewById(R.id.buttonStart);
+        btnStart.setEnabled(false);
+        btnStart.setOnClickListener(view -> {
+            Intent i = new Intent(MainActivity.this, GameActivity.class);
+            ArrayList<String> questionTags = new ArrayList<>();
+            ChipGroup chipGroup = findViewById(R.id.category_selection);
+            RadioGroup radioGroup = findViewById(R.id.radioGroup);
+            SeekBar seekBar = findViewById(R.id.seekBarDifficulty);
+            for (Integer id: chipGroup.getCheckedChipIds()) {
+                questionTags.add((String) ((Chip) findViewById(id)).getText());
+            }
+            i.putExtra("tags", questionTags);
+            i.putExtra("mode", ( (RadioButton) findViewById(radioGroup.getCheckedRadioButtonId())).getText());
+            i.putExtra("diff", seekBar.getProgress());
+            startActivity(i);
+
+        });
+
+        System.out.println(db.checkIfUserExists());
+
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -69,4 +109,5 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
 }

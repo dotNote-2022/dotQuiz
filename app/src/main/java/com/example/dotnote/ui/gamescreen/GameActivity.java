@@ -41,13 +41,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int totalQuestions;
     private int score = 0;
     private int points;
-    private DBManager db = DBManager.getInstance(this);
+    private final DBManager db = DBManager.getInstance(this);
     private QuestionManager questionManager;
-    private ArrayList<Button> answerButtons = new ArrayList<>();
+    private final ArrayList<Button> answerButtons = new ArrayList<>();
     private Question question;
     private ActionBar toolbar;
     private MediaPlayer music;
-    private Random random;
+    private final Random random = new Random();
+    private int diff;
 
     CountDownTimer countDownTimer;
 
@@ -63,7 +64,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         if (extras != null) {
             ArrayList<String> labels = extras.getStringArrayList("tags");
             System.out.println(labels.toString());
-            System.out.println(extras.getInt("diff"));
+            diff = extras.getInt("diff");
             this.setUpQuestions(labels, extras.getInt("diff"));
         }
 
@@ -143,17 +144,17 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void displayHelpBoostDialog() {
         final int[] gay = {-1};
-        String[] options = {"50/50 (100 points)", "Caller's help (80 points)", "New Question (60 points)", "Spectator Poll (70 points)"};
+        String[] options = {"50/50 \uD83C\uDFB2 (100 points) ", "Caller's help ☎️ (80 points)", "New Question \uD83D\uDD04 (60 points)", "Spectator Poll \uD83D\uDDF3️ (70 points)"};
         BoostType[] optionsEnum = {BoostType.FIFTY_FIFTY, BoostType.CALLER_HELP, BoostType.NEW_QUESTION, BoostType.SPECTATOR_POLL};
         int[] optionsCost = { 100, 80, 60, 70 };
         final String[] selected = {options[1]};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // Set the dialog title
-        builder.setTitle("Help boost")
+        builder.setTitle("\uD83D\uDCB2 Help boost \uD83D\uDCB2")
                 .setSingleChoiceItems(options, gay[0], new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        if (optionsCost[i] > points) {
+                        if (Constants.BOOST_COST[i] > points) {
                             Snackbar.make(findViewById(android.R.id.content), R.string.insufficient_points, Snackbar.LENGTH_SHORT).show();
                         } else {
                             gay[0] = i;
@@ -180,8 +181,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         db.purchaseBoost(BoostType.costs[choice.ordinal()]);
         this.fetchPoints();
-
-        random = new Random();
 
         switch(choice) {
 
@@ -334,11 +333,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             btn.setBackgroundColor(Color.GREEN);
             score += 100;
             music = MediaPlayer.create(this, random.nextBoolean()? R.raw.clapping1 : R.raw.clapping2);
-            music.start();
         } else {
             btn.setBackgroundColor(Color.RED);
-            if (this.score - 30 >= 0) {
-                this.score -= 30;
+            music = MediaPlayer.create(this, random.nextBoolean()? R.raw.trumpet_sad : R.raw.crowd_boo);
+            if (this.score - Constants.SCORE_LOSS[diff] >= 0) {
+                this.score -= Constants.SCORE_LOSS[diff];
             }
             for (Button btn1: answerButtons) {
                 if (this.question.isCorrectAnswer(btn1.getText().charAt(0) + "")) {
@@ -346,6 +345,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }
+        music.start();
         updateScore();
 
         new android.os.Handler(Looper.getMainLooper()).postDelayed(
@@ -355,9 +355,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                        btn3.setBackgroundColor(getResources().getColor(R.color.purple_200));
                    }
                    setUpNextQuestion();
-                   music.stop();
+                   if (music != null)
+                        music.stop();
                 },
-                3000);
+                3500);
 
 
     }

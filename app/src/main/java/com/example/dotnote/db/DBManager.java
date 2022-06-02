@@ -25,7 +25,7 @@ public class DBManager extends SQLiteOpenHelper {
 
     private static DBManager sInstance;
 
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "quizDB.db";
 
     // Questions table
@@ -181,7 +181,7 @@ public class DBManager extends SQLiteOpenHelper {
         }
         SELECT_QUESTIONS.append(")");
         SELECT_QUESTIONS.replace(SELECT_QUESTIONS.length() - 2, SELECT_QUESTIONS.length() - 1, "");
-        SELECT_QUESTIONS.append(" LIMIT ").append(Constants.ROUNDS[diff]);
+        SELECT_QUESTIONS.append(" LIMIT ").append(10);
 
         System.out.println(SELECT_QUESTIONS);
 

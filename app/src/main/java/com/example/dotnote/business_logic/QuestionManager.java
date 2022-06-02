@@ -59,9 +59,9 @@ public class QuestionManager {
         return returnQuestion;
     }
 
-    public void createQuestions(ArrayList<String> labels) {
+    public void createQuestions(ArrayList<String> labels, int diff) {
 
-       this.listOfQuestions = dbManager.fetchQuestions(labels);
+       this.listOfQuestions = dbManager.fetchQuestions(labels, diff);
        this.shuffleQuestions();
 
     }

@@ -25,7 +25,7 @@ public class DBManager extends SQLiteOpenHelper {
 
     private static DBManager sInstance;
 
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "quizDB.db";
 
     // Questions table
@@ -170,7 +170,7 @@ public class DBManager extends SQLiteOpenHelper {
      * @param labels an ArrayList with the types of the questions to be fetched
      * @return an ArrayList of Questions
      */
-    public ArrayList<Question> fetchQuestions(ArrayList<String> labels) {
+    public ArrayList<Question> fetchQuestions(ArrayList<String> labels, int diff) {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -181,6 +181,7 @@ public class DBManager extends SQLiteOpenHelper {
         }
         SELECT_QUESTIONS.append(")");
         SELECT_QUESTIONS.replace(SELECT_QUESTIONS.length() - 2, SELECT_QUESTIONS.length() - 1, "");
+        SELECT_QUESTIONS.append(" LIMIT ").append(Constants.ROUNDS[diff]);
 
         System.out.println(SELECT_QUESTIONS);
 
@@ -232,6 +233,23 @@ public class DBManager extends SQLiteOpenHelper {
 
         db.execSQL(UPDATE_STATS);
 
+    }
+
+    public void purchaseBoost(int cost) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor player = db.rawQuery("SELECT * FROM " + PLAYERS_TABLE + " LIMIT 1", null);
+
+        player.moveToFirst();
+
+        int playerId = player.getInt(0);
+        int currentPoints = player.getInt(2);
+
+        String UPDATE_POINTS = "UPDATE " + PLAYERS_TABLE +
+                " SET points=" + (currentPoints - cost)
+                + " WHERE _id=" + playerId + ";";
+
+        db.execSQL(UPDATE_POINTS);
     }
 
     public int getPlayerPoints() {

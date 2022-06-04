@@ -42,9 +42,6 @@ public class HomeFragment extends Fragment {
         TextView guideText = view.findViewById(R.id.text_guide_1);
         guideText.setText("1) Select the categories of questions for your quiz");
 
-        TextView guideText2 = view.findViewById(R.id.text_guide_2);
-        guideText2.setText("2) Select the type of quiz you want");
-
         this.createChips(view);
     }
 

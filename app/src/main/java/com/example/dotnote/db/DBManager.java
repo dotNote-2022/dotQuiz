@@ -228,7 +228,7 @@ public class DBManager extends SQLiteOpenHelper {
         int currentPoints = player.getInt(2);
 
         String UPDATE_STATS = "UPDATE " + PLAYERS_TABLE +
-                " SET points=" + (currentPoints + score / 10)
+                " SET points=" + (currentPoints + (score / 10))
                 + " WHERE _id=" + playerId + ";";
 
         db.execSQL(UPDATE_STATS);

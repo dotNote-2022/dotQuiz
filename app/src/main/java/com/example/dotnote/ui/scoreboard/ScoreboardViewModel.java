@@ -9,7 +9,7 @@ public class ScoreboardViewModel extends ViewModel {
 
     public ScoreboardViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is Personal Scoreboard fragment");
+        mText.setValue("");
     }
 
     public LiveData<String> getText() {

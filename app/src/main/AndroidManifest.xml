@@ -9,6 +9,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DotNote">
         <activity
+            android:name="com.example.dotnote.ui.endingscreen.GameEndActivity"
+            android:exported="false" />
+        <activity
             android:name=".EntryPage"
             android:exported="true">
             <intent-filter>
@@ -20,7 +23,7 @@
         <activity
             android:name=".ui.gamescreen.GameActivity"
             android:exported="false"
-            android:theme="@style/Theme.DotNote"/>
+            android:theme="@style/Theme.DotNote" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

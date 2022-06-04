@@ -28,6 +28,7 @@ import com.example.dotnote.business_logic.Constants;
 import com.example.dotnote.business_logic.Question;
 import com.example.dotnote.business_logic.QuestionManager;
 import com.example.dotnote.db.DBManager;
+import com.example.dotnote.ui.endingscreen.GameEndActivity;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.text.MessageFormat;
@@ -39,6 +40,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private int currentQuestion = 1;
     private int totalQuestions;
+    private int correctQuestions = 0, wrongQuestions = 0;
     private int score = 0;
     private int points;
     private final DBManager db = DBManager.getInstance(this);
@@ -259,8 +261,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setUpNextQuestion() {
 
+        System.out.println(questionManager.questionsRemaining());
+
         if (questionManager.questionsRemaining() <= 0) {
             finishGame();
+            return;
         }
 
         question = questionManager.getNextQuestion();
@@ -304,8 +309,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void finishGame() {
-        db.updatePlayerStats(score);
-        startActivity(new Intent(this, MainActivity.class));
+        Intent i = new Intent(this, GameEndActivity.class);
+        i.putExtra("correct", correctQuestions);
+        i.putExtra("wrong", wrongQuestions);
+        i.putExtra("total", totalQuestions);
+        i.putExtra("score", score);
+        startActivity(i);
     }
 
     @Override
@@ -332,9 +341,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         if (this.question.isCorrectAnswer(btn.getText().charAt(0) + "")) {
             btn.setBackgroundColor(Color.GREEN);
             score += 100;
+            correctQuestions++;
             music = MediaPlayer.create(this, random.nextBoolean()? R.raw.clapping1 : R.raw.clapping2);
         } else {
             btn.setBackgroundColor(Color.RED);
+            wrongQuestions++;
             music = MediaPlayer.create(this, random.nextBoolean()? R.raw.trumpet_sad : R.raw.crowd_boo);
             if (this.score - Constants.SCORE_LOSS[diff] >= 0) {
                 this.score -= Constants.SCORE_LOSS[diff];

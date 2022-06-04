@@ -78,13 +78,11 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(MainActivity.this, GameActivity.class);
             ArrayList<String> questionTags = new ArrayList<>();
             ChipGroup chipGroup = findViewById(R.id.category_selection);
-            RadioGroup radioGroup = findViewById(R.id.radioGroup);
             SeekBar seekBar = findViewById(R.id.seekBarDifficulty);
             for (Integer id: chipGroup.getCheckedChipIds()) {
                 questionTags.add((String) ((Chip) findViewById(id)).getText());
             }
             i.putExtra("tags", questionTags);
-            i.putExtra("mode", ( (RadioButton) findViewById(radioGroup.getCheckedRadioButtonId())).getText());
             i.putExtra("diff", seekBar.getProgress());
             startActivity(i);
 

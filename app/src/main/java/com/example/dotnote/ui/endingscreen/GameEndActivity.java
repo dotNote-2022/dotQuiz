@@ -42,6 +42,7 @@ public class GameEndActivity extends AppCompatActivity {
 
     private void updateUserData() {
         db.updatePlayerStats(score);
+        db.addHighscore(score);
     }
 
     private void setFields() {

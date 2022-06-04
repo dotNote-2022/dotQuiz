@@ -39,6 +39,7 @@ import java.util.Random;
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
     private int currentQuestion = 1;
+    private static int test = 0;
     private int totalQuestions;
     private int correctQuestions = 0, wrongQuestions = 0;
     private int score = 0;

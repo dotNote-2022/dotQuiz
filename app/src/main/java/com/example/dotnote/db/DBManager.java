@@ -13,19 +13,24 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import com.example.dotnote.business_logic.Constants;
+import com.example.dotnote.business_logic.Highscore;
 import com.example.dotnote.business_logic.Player;
 import com.example.dotnote.business_logic.Question;
 import com.example.dotnote.business_logic.QuestionType;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class DBManager extends SQLiteOpenHelper {
 
     private static DBManager sInstance;
 
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 10;
     private static final String DATABASE_NAME = "quizDB.db";
 
     // Questions table
@@ -42,6 +47,11 @@ public class DBManager extends SQLiteOpenHelper {
     public static final String COLUMN_ID_PLAYERS = "_id";
     public static final String COLUMN_USERNAME = "username";
     public static final String COLUMN_PLAYER_POINTS = "points";
+
+    // Highscores table
+    private static final String HIGHSCORES_TABLE = "Highscores";
+    private static final String HIGHSCORE_POINTS = "points";
+    private static final String HIGHSCORE_DATE = "date";
 
     public static synchronized DBManager getInstance(Context context) {
 
@@ -62,6 +72,8 @@ public class DBManager extends SQLiteOpenHelper {
 
         createQuestionsTable(sqLiteDatabase);
         createUsersTable(sqLiteDatabase);
+        createHighscoresTable(sqLiteDatabase);
+        initializeQuestions(sqLiteDatabase);
 
         System.out.println("Finished creating local DB");
 
@@ -95,6 +107,14 @@ public class DBManager extends SQLiteOpenHelper {
                 + ")";
 
         sqLiteDatabase.execSQL(CREATE_PLAYERS_TABLE_QUERY);
+    }
+
+    private void createHighscoresTable(SQLiteDatabase sqLiteDatabase) {
+        final String CREATE_HIGHSCORES_TABLE = "CREATE TABLE " + HIGHSCORES_TABLE + "("
+                + HIGHSCORE_POINTS + " INTEGER NOT NULL,"
+                + HIGHSCORE_DATE + " TEXT NOT NULL"
+                + ")";
+        sqLiteDatabase.execSQL(CREATE_HIGHSCORES_TABLE);
     }
 
     /**
@@ -137,21 +157,52 @@ public class DBManager extends SQLiteOpenHelper {
 
     }
 
-    public void addQuestion(Question question) {
-//        ContentValues values = new ContentValues();
-//        values.put(COLUMN_QUESTION_TEXT, "This is a test?");
-//        values.put(COLUMN_ANSWERS, "1,2,3,4");
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        db.insert(QUESTIONS_TABLE, null, values);
-//        db.close();
-        this.initializeQuestions();
+    public void createUser(String username) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String addNewUser = "INSERT INTO "
+                + PLAYERS_TABLE + "(" + COLUMN_ID_PLAYERS + "," + COLUMN_USERNAME + "," + COLUMN_PLAYER_POINTS + ")"
+                + "VALUES " + "(" + "null" + ",\"" + username + "\"," + 200 + ")";
+
+        db.execSQL(addNewUser);
+        db.close();
+    }
+
+    public void addHighscore(int score) {
+
+        Date c = Calendar.getInstance().getTime();
+
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        String formattedDate = df.format(c);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String addNewHighscore = "INSERT INTO "
+                + HIGHSCORES_TABLE + "(" + HIGHSCORE_POINTS + "," + HIGHSCORE_DATE + ") "
+                + "VALUES " + "(" + score + ",\"" + formattedDate + "\")";
+        db.execSQL(addNewHighscore);
+        db.close();
+    }
+
+    public ArrayList<Highscore> fetchHighscores() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String fetchHighscoresQuery = "SELECT " + HIGHSCORE_POINTS + "," + HIGHSCORE_DATE +  " FROM " + HIGHSCORES_TABLE;
+        Cursor highscoreCursor = db.rawQuery(fetchHighscoresQuery, null);
+
+        ArrayList<Highscore> highscores = new ArrayList<>();
+
+        if (highscoreCursor.moveToFirst()) {
+            do {
+                highscores.add(new Highscore(highscoreCursor.getInt(0), highscoreCursor.getString(1)));
+            } while (highscoreCursor.moveToNext());
+        }
+
+        db.close();
+        return highscores;
     }
 
     @SuppressLint("NewApi")
-    private void initializeQuestions() {
+    public void initializeQuestions(SQLiteDatabase DB) {
 
         ContentValues values = new ContentValues();
-        SQLiteDatabase DB = this.getWritableDatabase();
 
         for (Question question: Constants.QUESTIONS) {
             values.put(COLUMN_QUESTION_TEXT, question.getQuestionText());
@@ -162,7 +213,6 @@ public class DBManager extends SQLiteOpenHelper {
             DB.insert(QUESTIONS_TABLE, null, values);
             values.clear();
         }
-
     }
 
     /**

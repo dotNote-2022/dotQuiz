@@ -1,10 +1,12 @@
 package com.example.dotnote.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,11 +14,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.dotnote.MainActivity;
 import com.example.dotnote.R;
 import com.example.dotnote.business_logic.QuestionType;
 import com.example.dotnote.databinding.FragmentHomeBinding;
+import com.example.dotnote.ui.gamescreen.GameActivity;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+
+import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
@@ -41,6 +47,23 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         TextView guideText = view.findViewById(R.id.text_guide_1);
         guideText.setText("1) Select the categories of questions for your quiz");
+
+        Button btnStart = view.findViewById(R.id.buttonStart);
+        btnStart.setEnabled(false);
+        btnStart.setOnClickListener(viewC -> {
+            System.out.println("clicked");
+            Intent i = new Intent(getActivity(), GameActivity.class);
+            ArrayList<String> questionTags = new ArrayList<>();
+            ChipGroup chipGroup = view.findViewById(R.id.category_selection);
+            SeekBar seekBar = view.findViewById(R.id.seekBarDifficulty);
+            for (Integer id: chipGroup.getCheckedChipIds()) {
+                questionTags.add((String) ((Chip) view.findViewById(id)).getText());
+            }
+            i.putExtra("tags", questionTags);
+            i.putExtra("diff", seekBar.getProgress());
+            startActivity(i);
+
+        });
 
         this.createChips(view);
     }

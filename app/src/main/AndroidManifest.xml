@@ -9,6 +9,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DotNote">
         <activity
+            android:name="com.example.dotnote.ui.settings.SettingsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_settings" />
+        <activity
             android:name="com.example.dotnote.ui.endingscreen.GameEndActivity"
             android:exported="false" />
         <activity

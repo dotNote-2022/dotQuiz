@@ -11,9 +11,19 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="menu_tools">Scoreboard</string>
+    <string name="menu_settings">Settings</string>
     <string name="insufficient_points">You don\'t have enough points for that!</string>
     <string name="question_shuffled">Question shuffled!</string>
     <string name="scoreboard_alltime">All-time: </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="audio_header">Audio</string>
+
+    <!-- Messages Preferences -->
+    <string name="sfx_title">SFX</string>
+    <string name="music_title">MUSIC</string>
+    
 </resources>

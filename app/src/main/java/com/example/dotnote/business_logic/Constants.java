@@ -89,7 +89,6 @@ public class Constants {
             new Question("What year was the first Toy Story film released in cinemas?/1995/1999/2001/1992/1995/Movies_and_Series/false/none"),
             new Question("What year was the very first model of the iPhone released?/2004/2008/2009/2007/2007/Sports/false/none"),
             new Question("When was the band System of a Down formed?/1988/1987/1990/1992/1988/Music/false/none"),
-            new Question("When were System of A Down formed?/1988/1987/1990/1992/1988/Music/false/none"),
             new Question("Which actor broke two toes whilst filming The Lord of the Rings: The Two Towers?/Viggo Mortensen/Elijah Wood/Ian McKellen/Orlando Bloom/Viggo Mortensen/Movies_and_Series/false/none"),
             new Question("Which chemical element is historically known as quicksilver?/Platinum/Mercury/Silver/Gold/Mercury/Science/false/none"),
             new Question("Which computer programming language was known for its \"turtle graphics\"?/Logo/Python/COBOL/C++/Logo/Technology/false/none"),

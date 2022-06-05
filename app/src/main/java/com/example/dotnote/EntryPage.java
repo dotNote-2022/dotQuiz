@@ -9,22 +9,30 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.dotnote.db.DBManager;
 
 public class EntryPage extends AppCompatActivity {
     public Button button;
     public EditText myTextField;
+    private DBManager dbManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry_page);
+        dbManager = DBManager.getInstance(this);
         button = findViewById(R.id.button2);
 
         checkIfUserExists();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                dbManager.createUser(((TextView) findViewById(R.id.editTextTextPersonName2)).getText().toString());
+
                 Toast.makeText(EntryPage.this, myTextField.getText().toString() + "!", Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(EntryPage.this,MainActivity.class);
@@ -32,7 +40,7 @@ public class EntryPage extends AppCompatActivity {
             }
         });
     }
-    public boolean checkIfUserExists(){
+    public void checkIfUserExists(){
         button = findViewById(R.id.button2);
         button.setEnabled(false);
         myTextField = findViewById(R.id.editTextTextPersonName2);
@@ -44,11 +52,7 @@ public class EntryPage extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.length() == 0){
-                    button.setEnabled(false);
-                }
-                else
-                    button.setEnabled(true);
+                button.setEnabled(charSequence.length() != 0);
             }
 
             @Override
@@ -56,7 +60,6 @@ public class EntryPage extends AppCompatActivity {
 
             }
         });
-        return true;
     }
 
     @Override

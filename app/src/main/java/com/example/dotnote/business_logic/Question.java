@@ -114,6 +114,10 @@ public class Question {
         return answers.get(playerChoice).equals(correctAnswer);
     }
 
+    public void setAnswers(HashMap<String, String> answers) {
+        this.answers = answers;
+    }
+
     @Override
     public String toString() {
         return "Question{" +

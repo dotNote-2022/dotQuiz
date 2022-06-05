@@ -48,51 +48,39 @@ public class MainActivity extends AppCompatActivity {
 
         db = DBManager.getInstance(this);
 
+        System.out.println("create main");
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarMain.toolbar);
-        binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                db.addQuestion(null);
-            }
-        });
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
+                R.id.nav_home, R.id.nav_scoreboard, R.id.nav_settings)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        Button btnStart = findViewById(R.id.buttonStart);
-        btnStart.setEnabled(false);
-        btnStart.setOnClickListener(view -> {
-            Intent i = new Intent(MainActivity.this, GameActivity.class);
-            ArrayList<String> questionTags = new ArrayList<>();
-            ChipGroup chipGroup = findViewById(R.id.category_selection);
-            SeekBar seekBar = findViewById(R.id.seekBarDifficulty);
-            for (Integer id: chipGroup.getCheckedChipIds()) {
-                questionTags.add((String) ((Chip) findViewById(id)).getText());
-            }
-            i.putExtra("tags", questionTags);
-            i.putExtra("diff", seekBar.getProgress());
-            startActivity(i);
-
-        });
-
         System.out.println(db.checkIfUserExists());
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        System.out.println("destroy main");
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.out.println("adwwadawdawd");
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

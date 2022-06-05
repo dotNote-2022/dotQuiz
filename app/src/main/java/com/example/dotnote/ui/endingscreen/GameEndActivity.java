@@ -11,12 +11,13 @@ import android.widget.TextView;
 
 import com.example.dotnote.MainActivity;
 import com.example.dotnote.R;
+import com.example.dotnote.business_logic.MusicManager;
+import com.example.dotnote.business_logic.MusicTrack;
 import com.example.dotnote.db.DBManager;
 
 public class GameEndActivity extends AppCompatActivity {
 
     private DBManager db = DBManager.getInstance(this);
-    private MediaPlayer music;
 
     private int score, correct, wrong, total, points;
 
@@ -42,6 +43,7 @@ public class GameEndActivity extends AppCompatActivity {
 
     private void updateUserData() {
         db.updatePlayerStats(score);
+        db.addHighscore(score);
     }
 
     private void setFields() {
@@ -60,17 +62,14 @@ public class GameEndActivity extends AppCompatActivity {
 
         Button exitBtn = findViewById(R.id.buttonGoToMainScreen);
         exitBtn.setOnClickListener(view -> {
-            if (music != null) {
-                music.stop();
-            }
+            MusicManager.stop();
             startActivity(new Intent(this, MainActivity.class));
         });
 
     }
 
     private void setUpMusic() {
-        music = MediaPlayer.create(this, R.raw.main_menu_theme);
-        music.start();
+        MusicManager.playTrack(this, MusicTrack.ENDING_MUSIC);
     }
 
 }

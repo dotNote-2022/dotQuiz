@@ -25,6 +25,8 @@ import com.example.dotnote.MainActivity;
 import com.example.dotnote.R;
 import com.example.dotnote.business_logic.BoostType;
 import com.example.dotnote.business_logic.Constants;
+import com.example.dotnote.business_logic.MusicManager;
+import com.example.dotnote.business_logic.MusicTrack;
 import com.example.dotnote.business_logic.Question;
 import com.example.dotnote.business_logic.QuestionManager;
 import com.example.dotnote.db.DBManager;
@@ -39,6 +41,7 @@ import java.util.Random;
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
     private int currentQuestion = 1;
+    private static int test = 0;
     private int totalQuestions;
     private int correctQuestions = 0, wrongQuestions = 0;
     private int score = 0;
@@ -48,7 +51,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private final ArrayList<Button> answerButtons = new ArrayList<>();
     private Question question;
     private ActionBar toolbar;
-    private MediaPlayer music;
     private final Random random = new Random();
     private int diff;
 
@@ -176,10 +178,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void handleBoost(BoostType choice) {
 
+        MusicManager.playTrack(this, MusicTrack.COINS);
+
         ImageButton boostBtn = findViewById(R.id.helpBoostBtn);
         boostBtn.setEnabled(false);
-
-        System.out.println(choice);
 
         db.purchaseBoost(BoostType.costs[choice.ordinal()]);
         this.fetchPoints();
@@ -261,8 +263,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setUpNextQuestion() {
 
-        System.out.println(questionManager.questionsRemaining());
-
         if (questionManager.questionsRemaining() <= 0) {
             finishGame();
             return;
@@ -272,6 +272,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         TextView answerText = findViewById(R.id.textViewQuestionText);
         answerText.setText(question.getQuestionText());
+
+        TextView scoreText = findViewById(R.id.textView16);
+        scoreText.setText(score + "");
 
         int btnIndex = 0;
         for (String k: question.getAnswers().keySet()) {
@@ -342,11 +345,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             btn.setBackgroundColor(Color.GREEN);
             score += 100;
             correctQuestions++;
-            music = MediaPlayer.create(this, random.nextBoolean()? R.raw.clapping1 : R.raw.clapping2);
+            MusicManager.playCorrectAnswer(this);
         } else {
             btn.setBackgroundColor(Color.RED);
+            MusicManager.playWrongAnswer(this);
             wrongQuestions++;
-            music = MediaPlayer.create(this, random.nextBoolean()? R.raw.trumpet_sad : R.raw.crowd_boo);
             if (this.score - Constants.SCORE_LOSS[diff] >= 0) {
                 this.score -= Constants.SCORE_LOSS[diff];
             }
@@ -356,8 +359,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }
-        music.start();
-        updateScore();
+
 
         new android.os.Handler(Looper.getMainLooper()).postDelayed(
                 () -> {
@@ -366,8 +368,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                        btn3.setBackgroundColor(getResources().getColor(R.color.purple_200));
                    }
                    setUpNextQuestion();
-                   if (music != null)
-                        music.stop();
+                   MusicManager.stop();
                 },
                 3500);
 

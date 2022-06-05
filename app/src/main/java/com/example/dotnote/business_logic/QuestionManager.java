@@ -64,6 +64,10 @@ public class QuestionManager {
        this.listOfQuestions = dbManager.fetchQuestions(labels, diff);
        this.shuffleQuestions();
 
+       for (Question question: listOfQuestions) {
+           question.setAnswers(this.getQuestionAnswers(new ArrayList<>(question.getAnswers().values())));
+       }
+
     }
 
     public void resetQuestions() {
@@ -82,7 +86,7 @@ public class QuestionManager {
         Collections.shuffle(answers);
 
         HashMap<String, String> finalAnswers = new HashMap<>();
-        Character answerIndex = 'a';
+        Character answerIndex = 'A';
         for(String i: answers)
             finalAnswers.put((answerIndex++).toString(), i);
         return finalAnswers;

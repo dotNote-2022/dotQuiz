@@ -12,5 +12,9 @@
             android:id="@+id/nav_scoreboard"
             android:icon="@drawable/ic_menu_scoreboard"
             android:title="Scoreboard" />
+        <item
+            android:id="@+id/nav_gameInformation"
+            android:icon="@drawable/ic_menu_game_information"
+            android:title="Game Information" />
     </group>
 </menu>

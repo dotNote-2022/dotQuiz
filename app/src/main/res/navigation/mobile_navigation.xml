@@ -29,4 +29,10 @@
         android:label="Scoreboard"
         tools:layout="@layout/fragment_scoreboard" />
 
+    <fragment
+        android:id="@+id/nav_gameInformation"
+        android:name="com.example.dotnote.ui.slideshow.GameInformation"
+        android:label="Information"
+        tools:layout="@layout/fragment_game_information" />
+
 </navigation>

@@ -1,27 +1,11 @@
 package com.example.dotnote;
 
-import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.View;
 import android.view.Menu;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
-import com.example.dotnote.business_logic.Constants;
-import com.example.dotnote.business_logic.QuestionType;
 import com.example.dotnote.db.DBManager;
-import com.example.dotnote.ui.gamescreen.GameActivity;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
-import androidx.constraintlayout.widget.Group;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -30,11 +14,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dotnote.databinding.ActivityMainBinding;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         db = DBManager.getInstance(this);
 
-        System.out.println("create main");
+        
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -66,20 +45,18 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        System.out.println(db.checkIfUserExists());
+        
 
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        System.out.println("destroy main");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("adwwadawdawd");
     }
 
     @Override

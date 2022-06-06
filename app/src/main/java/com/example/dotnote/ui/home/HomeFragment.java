@@ -14,9 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.dotnote.MainActivity;
 import com.example.dotnote.R;
-import com.example.dotnote.business_logic.QuestionType;
+import com.example.dotnote.business_logic.questions.QuestionType;
 import com.example.dotnote.databinding.FragmentHomeBinding;
 import com.example.dotnote.ui.gamescreen.GameActivity;
 import com.google.android.material.chip.Chip;
@@ -36,7 +35,7 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        System.out.println("fragment");
+        
 
 
         return root;
@@ -51,7 +50,7 @@ public class HomeFragment extends Fragment {
         Button btnStart = view.findViewById(R.id.buttonStart);
         btnStart.setEnabled(false);
         btnStart.setOnClickListener(viewC -> {
-            System.out.println("clicked");
+            
             Intent i = new Intent(getActivity(), GameActivity.class);
             ArrayList<String> questionTags = new ArrayList<>();
             ChipGroup chipGroup = view.findViewById(R.id.category_selection);

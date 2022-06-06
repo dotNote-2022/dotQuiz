@@ -6,68 +6,58 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Looper;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.example.dotnote.MainActivity;
 import com.example.dotnote.R;
 import com.example.dotnote.business_logic.BoostType;
 import com.example.dotnote.business_logic.Constants;
-import com.example.dotnote.business_logic.MusicManager;
-import com.example.dotnote.business_logic.MusicTrack;
-import com.example.dotnote.business_logic.Question;
-import com.example.dotnote.business_logic.QuestionManager;
+import com.example.dotnote.business_logic.music.MusicManager;
+import com.example.dotnote.business_logic.music.MusicTrack;
+import com.example.dotnote.business_logic.questions.Question;
+import com.example.dotnote.business_logic.questions.QuestionManager;
 import com.example.dotnote.db.DBManager;
 import com.example.dotnote.ui.endingscreen.GameEndActivity;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Random;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
     private int currentQuestion = 1;
-    private static int test = 0;
     private int totalQuestions;
     private int correctQuestions = 0, wrongQuestions = 0;
     private int score = 0;
     private int points;
     private final DBManager db = DBManager.getInstance(this);
-    private QuestionManager questionManager;
+    private final QuestionManager questionManager = new QuestionManager(db);
     private final ArrayList<Button> answerButtons = new ArrayList<>();
     private Question question;
     private ActionBar toolbar;
     private final Random random = new Random();
     private int diff;
 
-    CountDownTimer countDownTimer;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
-        questionManager = new QuestionManager(db);
+        
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             ArrayList<String> labels = extras.getStringArrayList("tags");
-            System.out.println(labels.toString());
             diff = extras.getInt("diff");
             this.setUpQuestions(labels, extras.getInt("diff"));
         }
@@ -77,14 +67,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         this.setUpNextQuestion();
         this.fetchPoints();
 
-        TextView timerText = findViewById(R.id.textViewTimer);
-        timerText.setVisibility(View.GONE);
+        updateScore();
 
-        TextView scoreText = findViewById(R.id.textView16);
-        scoreText.setText(this.score + "");
+    }
 
-//        timer();
-
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     private void setUpActionBar() {
@@ -106,7 +95,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            this.finish();
+            new AlertDialog.Builder(this)
+                    .setTitle("Exiting the game")
+                    .setMessage("Are you sure?")
+                    .setPositiveButton("YES", (dialog, whichButton) -> {
+                        MusicManager.stop();
+                        finish();
+                        dialog.dismiss();
+                    }).setNegativeButton("NO", (dialog, whichButton) -> dialog.dismiss()).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -147,28 +143,24 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void displayHelpBoostDialog() {
-        final int[] gay = {-1};
+        final int[] selection = {-1};
         String[] options = {"50/50 \uD83C\uDFB2 (100 points) ", "Caller's help ☎️ (80 points)", "New Question \uD83D\uDD04 (60 points)", "Spectator Poll \uD83D\uDDF3️ (70 points)"};
         BoostType[] optionsEnum = {BoostType.FIFTY_FIFTY, BoostType.CALLER_HELP, BoostType.NEW_QUESTION, BoostType.SPECTATOR_POLL};
-        int[] optionsCost = { 100, 80, 60, 70 };
-        final String[] selected = {options[1]};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // Set the dialog title
         builder.setTitle("\uD83D\uDCB2 Help boost \uD83D\uDCB2")
-                .setSingleChoiceItems(options, gay[0], new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if (Constants.BOOST_COST[i] > points) {
-                            Snackbar.make(findViewById(android.R.id.content), R.string.insufficient_points, Snackbar.LENGTH_SHORT).show();
-                        } else {
-                            gay[0] = i;
-                        }
+                // Set help boost options
+                .setSingleChoiceItems(options, selection[0], (dialogInterface, i) -> {
+                    if (Constants.BOOST_COST[i] > points) {
+                        Snackbar.make(findViewById(android.R.id.content), R.string.insufficient_points, Snackbar.LENGTH_SHORT).show();
+                    } else {
+                        selection[0] = i;
                     }
                 })
                 // Set the action buttons
                 .setPositiveButton("Ok", (dialog, id) -> {
-                    if (gay[0] >= 0)
-                        handleBoost(optionsEnum[gay[0]]);
+                    if (selection[0] >= 0)
+                        handleBoost(optionsEnum[selection[0]]);
                 })
                 .setNegativeButton("Cancel", (dialog, id) -> {});
 
@@ -180,9 +172,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         MusicManager.playTrack(this, MusicTrack.COINS);
 
+        // disable help boost button so the player can't use a boost two times in one round
         ImageButton boostBtn = findViewById(R.id.helpBoostBtn);
         boostBtn.setEnabled(false);
 
+        // purchase the boost and update user's points
         db.purchaseBoost(BoostType.costs[choice.ordinal()]);
         this.fetchPoints();
 
@@ -190,6 +184,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             case FIFTY_FIFTY:
 
+                // make only the correct answer and one other random answer available
                 int correctIndex = 0;
                 int index = 0;
                 for (Button btn: answerButtons) {
@@ -211,6 +206,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case CALLER_HELP:
 
+                // fetch a random dialog answer and attach the correct answer with a chance of 50%
+
                 char[] ans = {'A', 'B', 'C', 'D'};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -220,11 +217,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         .setMessage(Constants.CALLER_QUOTES[random.nextInt(Constants.CALLER_QUOTES.length)]
                                 + (random.nextBoolean()? question.getCorrectAnswer() : question.getAnswers().get(ans[random.nextInt(ans.length)] + "")) )
 
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // User clicked OK button
-                            }
-                        })
+                        .setPositiveButton("Ok", (dialog, id) -> {})
 
                         .setIcon(R.drawable.ic_baseline_phone_24);
 
@@ -234,6 +227,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case NEW_QUESTION:
 
+                // skips question
+
                 this.setUpNextQuestion();
 
                 Snackbar.make(findViewById(android.R.id.content), R.string.question_shuffled, Snackbar.LENGTH_SHORT).show();
@@ -241,6 +236,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case SPECTATOR_POLL:
 
+                // fetch random statistics ([0, 100]) and add 50 to the correct answer
 
                 StringBuilder pollString = new StringBuilder();
                 for (String k: question.getAnswerKeySet()) {
@@ -263,6 +259,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setUpNextQuestion() {
 
+        // no more questions remaining, exit the game
         if (questionManager.questionsRemaining() <= 0) {
             finishGame();
             return;
@@ -273,10 +270,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         TextView answerText = findViewById(R.id.textViewQuestionText);
         answerText.setText(question.getQuestionText());
 
-        TextView scoreText = findViewById(R.id.textView16);
-        scoreText.setText(score + "");
+        updateScore();
 
         int btnIndex = 0;
+
+        // set up buttons with their respective answers
         for (String k: question.getAnswers().keySet()) {
             answerButtons.get(btnIndex).setText(String.format("%s) %s", k, question.getAnswers().get(k)));
             answerButtons.get(btnIndex).setEnabled(true);
@@ -286,6 +284,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         ImageButton boostBtn = findViewById(R.id.helpBoostBtn);
         boostBtn.setEnabled(true);
 
+        // update game's round progress
         toolbar.setTitle("Question " + this.currentQuestion++ + "" + "/" + this.totalQuestions);
 
     }
@@ -295,23 +294,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         scoreText.setText(MessageFormat.format("{0}", this.score));
     }
 
-    private void  timer(){
-        TextView myTimer = findViewById(R.id.textViewTimer);
-        countDownTimer = new CountDownTimer(20000,1000) {
-            @Override
-            public void onTick(long l) {
-                myTimer.setText(Long.toString(l));
-                System.out.println(l);
-            }
-
-            @Override
-            public void onFinish() {
-                setUpNextQuestion();
-            }
-        }.start();
-    }
-
     private void finishGame() {
+        // add relevant statistics and navigate to GameEndActivity
         Intent i = new Intent(this, GameEndActivity.class);
         i.putExtra("correct", correctQuestions);
         i.putExtra("wrong", wrongQuestions);
@@ -326,6 +310,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 .setTitle("Exiting the game")
                 .setMessage("Are you sure?")
                 .setPositiveButton("YES", (dialog, whichButton) -> {
+                    MusicManager.stop();
                     finish();
                     dialog.dismiss();
                 }).setNegativeButton("NO", (dialog, whichButton) -> dialog.dismiss()).show();
@@ -347,12 +332,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             correctQuestions++;
             MusicManager.playCorrectAnswer(this);
         } else {
+            // highlight the wrong answer
             btn.setBackgroundColor(Color.RED);
             MusicManager.playWrongAnswer(this);
             wrongQuestions++;
+            // lower score if the difference wont result in negative score
             if (this.score - Constants.SCORE_LOSS[diff] >= 0) {
                 this.score -= Constants.SCORE_LOSS[diff];
             }
+            // highlight the correct question
             for (Button btn1: answerButtons) {
                 if (this.question.isCorrectAnswer(btn1.getText().charAt(0) + "")) {
                     btn1.setBackgroundColor(Color.GREEN);
@@ -360,10 +348,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-
+        // set a timer of 3.5 seconds, then proceed to the next round
         new android.os.Handler(Looper.getMainLooper()).postDelayed(
                 () -> {
                    questionManager.removeAnsweredQuestion();
+                   // reset buttons to origin color
                    for (Button btn3: answerButtons) {
                        btn3.setBackgroundColor(getResources().getColor(R.color.purple_200));
                    }

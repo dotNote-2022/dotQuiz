@@ -1,5 +1,8 @@
 package com.example.dotnote.business_logic;
 
+/**
+ * Enum representing the various help boosts and their associated costs
+ */
 public enum BoostType {
     FIFTY_FIFTY,
     CALLER_HELP,

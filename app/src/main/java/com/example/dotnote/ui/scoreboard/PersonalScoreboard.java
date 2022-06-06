@@ -36,7 +36,7 @@ public class PersonalScoreboard extends Fragment {
         scoreboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         introView();
         scoreBoard = new ScoreBoard(this.getContext());
-        System.out.println("KEKW");
+        
         displayRestScores(scoreBoard.playerScores);
         return root;
     }

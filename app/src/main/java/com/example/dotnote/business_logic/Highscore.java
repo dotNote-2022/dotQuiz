@@ -1,8 +1,11 @@
 package com.example.dotnote.business_logic;
 
+/**
+ * Class representing a high score entry
+ */
 public class Highscore {
-    private int score;
-    private String date;
+    private final int score;
+    private final String date;
 
     public Highscore(int score, String date) {
         this.score = score;

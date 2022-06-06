@@ -8,9 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.example.dotnote.R;
-import com.example.dotnote.business_logic.MusicManager;
-
-import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
 

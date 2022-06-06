@@ -1,23 +1,23 @@
 package com.example.dotnote.ui.endingscreen;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.dotnote.MainActivity;
 import com.example.dotnote.R;
-import com.example.dotnote.business_logic.MusicManager;
-import com.example.dotnote.business_logic.MusicTrack;
+import com.example.dotnote.business_logic.music.MusicManager;
+import com.example.dotnote.business_logic.music.MusicTrack;
 import com.example.dotnote.db.DBManager;
 
 public class GameEndActivity extends AppCompatActivity {
 
-    private DBManager db = DBManager.getInstance(this);
+    private final DBManager db = DBManager.getInstance(this);
+    private ActionBar toolbar;
 
     private int score, correct, wrong, total, points;
 
@@ -26,6 +26,7 @@ public class GameEndActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_end);
         getIntentData();
+        setUpActionBar();
         updateUserData();
         setFields();
         setUpMusic();
@@ -62,14 +63,33 @@ public class GameEndActivity extends AppCompatActivity {
 
         Button exitBtn = findViewById(R.id.buttonGoToMainScreen);
         exitBtn.setOnClickListener(view -> {
-            MusicManager.stop();
-            startActivity(new Intent(this, MainActivity.class));
+            navigateToMain();
         });
 
+    }
+
+    private void setUpActionBar() {
+        toolbar = getSupportActionBar();
+        if (toolbar != null) {
+            toolbar.setDisplayHomeAsUpEnabled(false);
+            toolbar.setTitle("Game Results");
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        navigateToMain();
     }
 
     private void setUpMusic() {
         MusicManager.playTrack(this, MusicTrack.ENDING_MUSIC);
     }
+
+    private void navigateToMain() {
+        MusicManager.stop();
+        startActivity(new Intent(this, MainActivity.class));
+    }
+
 
 }

@@ -4,11 +4,10 @@ package com.example.dotnote.business_logic;
 /**
  * A simple class representing a player in our game
  *
- * @author Fotios-Dimitrios Malakis
  */
 public class Player {
     private int score;
-    private String name;
+    private final String name;
 
 
     /**

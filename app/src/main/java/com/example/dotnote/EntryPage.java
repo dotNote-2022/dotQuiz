@@ -27,17 +27,14 @@ public class EntryPage extends AppCompatActivity {
         button = findViewById(R.id.button2);
 
         checkIfUserExists();
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        button.setOnClickListener(view -> {
 
-                dbManager.createUser(((TextView) findViewById(R.id.editTextTextPersonName2)).getText().toString());
+            dbManager.createUser(((TextView) findViewById(R.id.editTextTextPersonName2)).getText().toString());
 
-                Toast.makeText(EntryPage.this, myTextField.getText().toString() + "!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(EntryPage.this, "Welcome " + myTextField.getText().toString() + "!", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(EntryPage.this,MainActivity.class);
-                startActivity(intent);
-            }
+            Intent intent = new Intent(EntryPage.this,MainActivity.class);
+            startActivity(intent);
         });
     }
     public void checkIfUserExists(){
@@ -68,14 +65,4 @@ public class EntryPage extends AppCompatActivity {
         super.onResume();
         checkIfUserExists();
     }
-
-    /*public void clickFunction(View view){ //function gia to button to settarw sto onClick
-
-        EditText myTextField = findViewById(R.id.editTextTextPersonName2); // R -> Resources
-
-        //Toast.makeText(EntryPage.this, myTextField.getText().toString() + "!", Toast.LENGTH_SHORT).show(); // mynhma pou skaei apo katw
-
-        Log.i("Username", myTextField.getText().toString()); // LOG INFO
-        //System.out.println(myTextField.getText().toString());
-    }*/
 }

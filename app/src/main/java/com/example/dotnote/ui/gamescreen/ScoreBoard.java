@@ -15,7 +15,7 @@ public class ScoreBoard {
 
     public ScoreBoard(Context context) {
         dbManager = DBManager.getInstance(context);
-        System.out.println(dbManager.fetchHighscores());
+        
         this.updateList();
     }
 

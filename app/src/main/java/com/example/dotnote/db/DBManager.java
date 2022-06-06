@@ -6,19 +6,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
-import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 import com.example.dotnote.business_logic.Constants;
 import com.example.dotnote.business_logic.Highscore;
 import com.example.dotnote.business_logic.Player;
-import com.example.dotnote.business_logic.Question;
-import com.example.dotnote.business_logic.QuestionType;
+import com.example.dotnote.business_logic.questions.Question;
+import com.example.dotnote.business_logic.questions.QuestionType;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,33 +22,44 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
+/**
+ * A singleton class that extends SQLiteOpenHelper and manages the intercommunication
+ * of the app's logic and the integrated SQLite database
+ */
 public class DBManager extends SQLiteOpenHelper {
 
     private static DBManager sInstance;
 
+    // DB information
     private static final int DATABASE_VERSION = 10;
     private static final String DATABASE_NAME = "quizDB.db";
 
     // Questions table
-    public static final String QUESTIONS_TABLE = "Questions";
-    public static final String COLUMN_ID_QUESTIONS = "_id";
-    public static final String COLUMN_QUESTION_TEXT = "questionText";
-    public static final String COLUMN_CORRECT_ANSWER = "correctAnswer";
-    public static final String COLUMN_QUESTION_TYPE = "type";
-    public static final String COLUMN_ANSWERS = "answers";
-    public static final String COLUMN_PICTURE = "picture";
+    private static final String QUESTIONS_TABLE = "Questions";
+    private static final String COLUMN_ID_QUESTIONS = "_id";
+    private static final String COLUMN_QUESTION_TEXT = "questionText";
+    private static final String COLUMN_CORRECT_ANSWER = "correctAnswer";
+    private static final String COLUMN_QUESTION_TYPE = "type";
+    private static final String COLUMN_ANSWERS = "answers";
+    private static final String COLUMN_PICTURE = "picture";
 
     // Users table
-    public static final String PLAYERS_TABLE = "Players";
-    public static final String COLUMN_ID_PLAYERS = "_id";
-    public static final String COLUMN_USERNAME = "username";
-    public static final String COLUMN_PLAYER_POINTS = "points";
+    private static final String PLAYERS_TABLE = "Players";
+    private static final String COLUMN_ID_PLAYERS = "_id";
+    private static final String COLUMN_USERNAME = "username";
+    private static final String COLUMN_PLAYER_POINTS = "points";
 
     // Highscores table
     private static final String HIGHSCORES_TABLE = "Highscores";
     private static final String HIGHSCORE_POINTS = "points";
     private static final String HIGHSCORE_DATE = "date";
 
+    /**
+     * Checks if DBManager has already been initialized and if necessary, initializes it
+     * before returning it
+     * @param context the application context
+     * @return the instance of DBManager currently running
+     */
     public static synchronized DBManager getInstance(Context context) {
 
         if (sInstance == null) {
@@ -67,15 +74,11 @@ public class DBManager extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        System.out.println("Creating DB...");
-//        this.initializeQuestions();
 
         createQuestionsTable(sqLiteDatabase);
         createUsersTable(sqLiteDatabase);
         createHighscoresTable(sqLiteDatabase);
         initializeQuestions(sqLiteDatabase);
-
-        System.out.println("Finished creating local DB");
 
     }
 
@@ -83,6 +86,7 @@ public class DBManager extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + QUESTIONS_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PLAYERS_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + HIGHSCORES_TABLE);
         onCreate(sqLiteDatabase);
     }
     
@@ -129,13 +133,13 @@ public class DBManager extends SQLiteOpenHelper {
         cursor.moveToFirst();
 
         if (cursor.getInt(0) == 0) {
-            System.out.println("No player registered");
+            
             db.close();
             return false;
         }
 
         db.close();
-        System.out.println("Player registered");
+        
         return true;
     }
 
@@ -157,6 +161,11 @@ public class DBManager extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * Creates a record in the Player's table with the given username and initializes
+     * their points to 200
+     * @param username String, the username of the user
+     */
     public void createUser(String username) {
         SQLiteDatabase db = this.getWritableDatabase();
         String addNewUser = "INSERT INTO "
@@ -167,6 +176,11 @@ public class DBManager extends SQLiteOpenHelper {
         db.close();
     }
 
+    /**
+     * Adds a high score record to the database, consisting of the score the the date during which
+     * this method was invoked
+     * @param score int, the score to be added
+     */
     public void addHighscore(int score) {
 
         Date c = Calendar.getInstance().getTime();
@@ -182,6 +196,10 @@ public class DBManager extends SQLiteOpenHelper {
         db.close();
     }
 
+    /**
+     * Fetches all of the high scores from the database
+     * @return ArrayList\<HighScore\> containing all of the high scores
+     */
     public ArrayList<Highscore> fetchHighscores() {
         SQLiteDatabase db = this.getReadableDatabase();
         String fetchHighscoresQuery = "SELECT " + HIGHSCORE_POINTS + "," + HIGHSCORE_DATE +  " FROM " + HIGHSCORES_TABLE;
@@ -233,7 +251,7 @@ public class DBManager extends SQLiteOpenHelper {
         SELECT_QUESTIONS.replace(SELECT_QUESTIONS.length() - 2, SELECT_QUESTIONS.length() - 1, "");
         SELECT_QUESTIONS.append(" LIMIT ").append(10);
 
-        System.out.println(SELECT_QUESTIONS);
+        
 
         Cursor cursorQuestions = db.rawQuery(SELECT_QUESTIONS.toString(), null);
 
@@ -267,6 +285,10 @@ public class DBManager extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * Updates a player's points based on their ending score
+     * @param score int, the score the player reached at the end of a game
+     */
     public void updatePlayerStats(int score) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -285,6 +307,10 @@ public class DBManager extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * Update's a user's points when a help boost is purchased
+     * @param cost int, the cost of the boost
+     */
     public void purchaseBoost(int cost) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -302,6 +328,10 @@ public class DBManager extends SQLiteOpenHelper {
         db.execSQL(UPDATE_POINTS);
     }
 
+    /**
+     * Fetches the current player's points
+     * @return int, the player's points
+     */
     public int getPlayerPoints() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor pointsCursor = db.rawQuery("SELECT " + COLUMN_PLAYER_POINTS + " FROM " + PLAYERS_TABLE + " LIMIT 1", null);

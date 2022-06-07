@@ -55,6 +55,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_game);
         
 
+        // fetch the data about difficulty and labels from the intent
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             ArrayList<String> labels = extras.getStringArrayList("tags");
@@ -79,12 +80,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void setUpActionBar() {
         toolbar = getSupportActionBar();
         if (toolbar != null) {
-            toolbar.setDisplayHomeAsUpEnabled(true);
+            toolbar.setDisplayHomeAsUpEnabled(true); // display the back button
         }
 
     }
 
     private void fetchPoints() {
+        // fetch points from db and update the score on the toolbar
         this.points = db.getPlayerPoints();
         TextView pointsTextView = findViewById(R.id.points);
         pointsTextView.setText(MessageFormat.format("{0}", points));
@@ -94,6 +96,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // user pressed the toolbar's back button
         if (item.getItemId() == android.R.id.home) {
             new AlertDialog.Builder(this)
                     .setTitle("Exiting the game")
@@ -117,6 +120,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void setUpButtons() {
 
+        // set up the main 4 answer buttons
+
         Button answer1 = findViewById(R.id.buttonAns1);
         answer1.setOnClickListener(this);
 
@@ -134,6 +139,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         answerButtons.add(answer3);
         answerButtons.add(answer4);
 
+        // set up the help boost button
         ImageButton helpBoostBtn = findViewById(R.id.helpBoostBtn);
         helpBoostBtn.setOnClickListener(view -> {
             displayHelpBoostDialog();
@@ -143,6 +149,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void displayHelpBoostDialog() {
+
+        // set up the contents of the help boost
         final int[] selection = {-1};
         String[] options = {"50/50 \uD83C\uDFB2 (100 points) ", "Caller's help ☎️ (80 points)", "New Question \uD83D\uDD04 (60 points)", "Spectator Poll \uD83D\uDDF3️ (70 points)"};
         BoostType[] optionsEnum = {BoostType.FIFTY_FIFTY, BoostType.CALLER_HELP, BoostType.NEW_QUESTION, BoostType.SPECTATOR_POLL};

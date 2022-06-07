@@ -109,9 +109,10 @@
                 android:layout_marginStart="29dp"
                 android:layout_marginEnd="24dp"
                 android:text="Button"
-                app:layout_constraintBaseline_toBaselineOf="@+id/buttonAns1"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/buttonAns1"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/buttonAns1"
@@ -138,9 +139,10 @@
                 android:layout_marginStart="29dp"
                 android:layout_marginEnd="24dp"
                 android:text="Button"
-                app:layout_constraintBaseline_toBaselineOf="@+id/buttonAns3"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/buttonAns3"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/buttonAns3"
@@ -148,6 +150,7 @@
                 android:layout_height="74dp"
                 android:layout_marginEnd="24dp"
                 android:text="Button"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/buttonAns4"
                 app:layout_constraintTop_toTopOf="parent" />

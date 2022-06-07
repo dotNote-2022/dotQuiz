@@ -1,4 +1,4 @@
-package com.example.dotnote.ui.gamescreen;
+package com.example.dotnote.business_logic.scoreboard;
 import android.content.Context;
 
 import com.example.dotnote.business_logic.Highscore;
@@ -6,14 +6,14 @@ import com.example.dotnote.db.DBManager;
 
 import java.util.*;
 
-public class ScoreBoard {
+public class ScoreboardManager {
     private int score;
     private int highScore;
 
     public ArrayList<Highscore> playerScores;
     private final DBManager dbManager;
 
-    public ScoreBoard(Context context) {
+    public ScoreboardManager(Context context) {
         dbManager = DBManager.getInstance(context);
         
         this.updateList();

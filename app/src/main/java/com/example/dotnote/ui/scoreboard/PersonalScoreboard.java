@@ -14,14 +14,13 @@ import android.widget.TextView;
 
 import com.example.dotnote.business_logic.Highscore;
 import com.example.dotnote.databinding.FragmentScoreboardBinding;
-import com.example.dotnote.ui.gamescreen.ScoreBoard;
+import com.example.dotnote.business_logic.scoreboard.ScoreboardManager;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PersonalScoreboard extends Fragment {
     private FragmentScoreboardBinding binding;
-    ScoreBoard scoreBoard;
+    ScoreboardManager scoreboardManager;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -35,9 +34,9 @@ public class PersonalScoreboard extends Fragment {
         textView.setText("All-time: ");
         scoreboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         introView();
-        scoreBoard = new ScoreBoard(this.getContext());
+        scoreboardManager = new ScoreboardManager(this.getContext());
         
-        displayRestScores(scoreBoard.playerScores);
+        displayRestScores(scoreboardManager.playerScores);
         return root;
     }
 
